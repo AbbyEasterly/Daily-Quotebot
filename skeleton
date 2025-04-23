@@ -1,3 +1,4 @@
+
 #!/usr/bin/env python3
 import argparse
 import asyncio
@@ -7,9 +8,8 @@ import ssl
 import time
 
 # === Settings ===
-cmd_flood = 3  # Delay between !commands
+cmd_flood = 3
 
-# === IRC Formatting Colors ===
 bold = '\x02'; italic = '\x1D'; underline = '\x1F'; reverse = '\x16'; reset = '\x0f'
 red = '04'
 
@@ -75,11 +75,7 @@ class Bot():
         msg = ' '.join(parts[3:])[1:]
 
         if target == self.nickname:
-            if ident == 'acidvegas!stillfree@big.dick.acid.vegas':
-                if msg.startswith('!raw') and len(msg.split()) > 1:
-                    await self.raw(' '.join(msg.split()[1:]))
-            else:
-                await self.sendmsg(nick, 'Do NOT message me!')
+            await self.sendmsg(nick, 'Do NOT message me!')
         elif target.startswith('#'):
             if msg.startswith('!'):
                 if time.time() - self.last < cmd_flood:
@@ -106,9 +102,10 @@ class Bot():
                 await self.raw('PONG ' + parts[1])
             elif parts[1] == '001':
                 await self.raw(f'MODE {self.nickname} +B')
-               ''' await self.sendmsg('NickServ', f'IDENTIFY {self.nickname} simps0nsfan420')
-                await self.raw('OPER MrSysadmin fartsimps0n1337')
-                await asyncio.sleep(10) '''
+                # Commented out for now: NickServ and OPER (used in testing)
+                # await self.sendmsg('NickServ', f'IDENTIFY {self.nickname} simps0nsfan420')
+                # await self.raw('OPER MrSysadmin fartsimps0n1337')
+                await asyncio.sleep(10)
                 if hasattr(args, 'key') and args.key:
                     await self.raw(f'JOIN {args.channel} {args.key}')
                 else:
@@ -144,7 +141,6 @@ def setup_logger(log_filename: str, to_file: bool = False):
     else:
         logging.basicConfig(level=logging.NOTSET, handlers=(sh,))
 
-# === Main Program Entrypoint ===
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Connect to an IRC server.")
     parser.add_argument("server", help="The IRC server address.")
