@@ -12,3 +12,9 @@ connect to unreal
 download git 
 
 download github
+
+
+usage: chatBot.py [-h] [--password PASSWORD] [--port PORT] [--ssl] [--v4]
+                  [--v6] [--key KEY] [--vhost VHOST]
+                  10.20.239.122 #mychan
+chatBot.py: error: the following arguments are required: 10.20.239.122, #mychan
