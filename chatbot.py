@@ -6,6 +6,7 @@ import logging
 import logging.handlers
 import ssl
 import time
+import re
 
 # === Settings ===
 cmd_flood = 3
@@ -67,6 +68,7 @@ class Bot():
             finally:
                 await asyncio.sleep(30)
 
+
     async def eventPRIVMSG(self, data):
         parts = data.split()
         ident = parts[0][1:]
@@ -75,7 +77,8 @@ class Bot():
         msg = ' '.join(parts[3:])[1:]
 
         if target == self.nickname:
-            await self.sendmsg(nick, 'Marlon')
+            await self.sendmsg(nick, "Secrets don't make friends")
+
         elif target.startswith('#'):
             if msg.startswith('!'):
                 if time.time() - self.last < cmd_flood:
@@ -86,6 +89,8 @@ class Bot():
                     self.slow = False
                     if msg == '!help':
                         await self.action(target, 'explodes')
+                    elif re.match(r'^!skeleton [a-zA-Z ]+$', msg):
+                        await self.action(target, 'I DONT UNDERSTAND ')
                     elif msg == '!ping':
                         await self.sendmsg(target, 'Pong!')
                     elif msg.startswith('!say') and len(msg.split()) > 1:
@@ -110,6 +115,8 @@ class Bot():
                     await self.raw(f'JOIN {args.channel} {args.key}')
                 else:
                     await self.raw(f'JOIN {args.channel}')
+                await self.sendmsg(args.channel, "Hello, everyone! Skeleton is alive.")
+
             elif parts[1] == '433':
                 self.nickname += '_'
                 await self.raw('NICK ' + self.nickname)
@@ -159,4 +166,3 @@ if __name__ == '__main__':
     setup_logger('skeleton', to_file=True)
     bot = Bot()
     asyncio.run(bot.connect())
-
