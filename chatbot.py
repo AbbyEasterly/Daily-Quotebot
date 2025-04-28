@@ -89,7 +89,9 @@ class Bot():
                     self.slow = False
                     if msg == '!help':
                         await self.action(target, 'explodes')
-                    elif re.match(r'^!skeleton [a-zA-Z ]+$', msg):
+                    elif re.match(r'^!skeleton[a-zA-Z 0-9,;.!?\'"-]*joke[a-zA-Z 0-9,;.!?\'"-]*$', msg):
+                        await self.action(target, 'I would but i dont know any ')
+                    elif re.match(r'^!skeleton[a-zA-Z 0-9,;.!?\'"-]+$', msg):
                         await self.action(target, 'I DONT UNDERSTAND ')
                     elif msg == '!ping':
                         await self.sendmsg(target, 'Pong!')
@@ -116,6 +118,7 @@ class Bot():
                 else:
                     await self.raw(f'JOIN {args.channel}')
                 await self.sendmsg(args.channel, "Hello, everyone! Skeleton is alive.")
+                await self.sendmsg(args.channel, "Ask me for a joke (start line with !skeleton to address me) or ask !help for details")
 
             elif parts[1] == '433':
                 self.nickname += '_'
