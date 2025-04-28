@@ -7,6 +7,8 @@ import logging.handlers
 import ssl
 import time
 import re
+import pandas as pd
+import random
 
 # === Settings ===
 cmd_flood = 3
@@ -24,6 +26,13 @@ def ssl_ctx(verify=False, cert_path=None, cert_pass=None) -> ssl.SSLContext:
     return ctx
 
 class Bot():
+
+
+
+
+
+
+
     def __init__(self):
         self.nickname = 'skeleton'
         self.username = 'skelly'
@@ -33,6 +42,7 @@ class Bot():
         self.last = time.time()
         self.slow = False
 
+
     async def action(self, chan, msg):
         await self.sendmsg(chan, f'\x01ACTION {msg}\x01')
 
@@ -41,6 +51,8 @@ class Bot():
 
     async def sendmsg(self, target, msg):
         await self.raw(f'PRIVMSG {target} :{msg}')
+
+
 
     async def connect(self):
         while True:
@@ -81,6 +93,7 @@ class Bot():
 
         elif target.startswith('#'):
             if msg.startswith('!'):
+
                 if time.time() - self.last < cmd_flood:
                     if not self.slow:
                         self.slow = True
@@ -89,15 +102,70 @@ class Bot():
                     self.slow = False
                     if msg == '!help':
                         await self.action(target, 'explodes')
-                    elif re.match(r'^!skeleton[a-zA-Z 0-9,;.!?\'"-]*joke[a-zA-Z 0-9,;.!?\'"-]*$', msg):
-                        await self.action(target, 'I would but i dont know any ')
-                    elif re.match(r'^!skeleton[a-zA-Z 0-9,;.!?\'"-]+$', msg):
-                        await self.action(target, 'I DONT UNDERSTAND ')
                     elif msg == '!ping':
                         await self.sendmsg(target, 'Pong!')
                     elif msg.startswith('!say') and len(msg.split()) > 1:
                         await self.sendmsg(target, ' '.join(msg.split()[1:]))
                     self.last = time.time()
+            elif msg.startswith('@'):
+
+                if "@skeleton" in msg and "joke" in msg:
+
+                    jokes_split = [
+                        ("Why don’t skeletons fight each other?", "They don’t have the guts."),
+                        ("What did the janitor say when he jumped out of the closet?", "Supplies!"),
+                        ("Why did the scarecrow win an award?", "Because he was outstanding in his field."),
+                        ("What do you call fake spaghetti?", "An impasta."),
+                        ("Why can't you give Elsa a balloon?", "Because she’ll let it go."),
+                        ("I told my wife she was drawing her eyebrows too high...", "She looked surprised."),
+                        ("Parallel lines have so much in common...", "It’s a shame they’ll never meet."),
+                        ("Why did the coffee file a police report?", "It got mugged."),
+                        ("What’s orange and sounds like a parrot?", "A carrot."),
+                        ("Why don’t some couples go to the gym?", "Because some relationships don’t work out.")
+                    ]
+                    jokes = [
+                        {"Setup": "Knock knock", "Response": "Lettuce","Punchline": "Lettuce in, it’s cold out here!"},
+                        {"Setup": "Knock knock", "Response": "Cow says", "Punchline": "Cow says mooo!"},
+                        {"Setup": "Knock knock", "Response": "Boo", "Punchline": "Aw, don’t cry—it’s just a joke!"},
+                        {"Setup": "Knock knock", "Response": "Tank", "Punchline": "You’re welcome!"},
+                        {"Setup": "Knock knock", "Response": "Atch", "Punchline": "Bless you!"},
+                        {"Setup": "Knock knock", "Response": "Olive", "Punchline": "Olive you and I miss you!"},
+                        {"Setup": "Knock knock", "Response": "Dishes", "Punchline": "Dishes the police—open up!"},
+                        {"Setup": "Knock knock", "Response": "Nana", "Punchline": "Nana your business!"},
+                        {"Setup": "Knock knock", "Response": "Broken Pencil",   "Punchline": "Never mind, it’s pointless."},
+                        {"Setup": "Knock knock", "Response": "Ya", "Punchline": "No thanks, I use Google."},
+                    ]
+                    randkind = random.randint(0, 1)
+                    random_number = random.randint(0, 9)
+                    if randkind == 0:
+                        # Convert to a DataFrame
+                        jokes_df = pd.DataFrame(jokes)
+                        await self.action(target, jokes_df.iloc[random_number]["Setup"])
+                        await self.action(target, "(say 'who's there)")
+                        await asyncio.sleep(4)
+
+                        y = jokes_df.iloc[random_number]["Response"]
+                        await self.action(target, y)
+                        await self.action(target, ("(you say: " + y + " who?)"))
+                        await asyncio.sleep(4)
+
+                        await self.action(target, (jokes_df.iloc[random_number]["Punchline"]))
+                    # Display the DataFrame
+                    else:
+                        df = pd.DataFrame(jokes_split, columns=["Question", "Answer"])
+
+                        await self.action(target, df.iloc[random_number]["Question"])
+                        await asyncio.sleep(2)
+                        await self.action(target, "...")
+                        await asyncio.sleep(2)
+                        await self.action(target, df.iloc[random_number]["Answer"])
+
+
+
+                elif re.match(r'^!skeleton[a-zA-Z 0-9,;.!?\'"-]+$', msg):
+                        await self.action(target, 'I DONT UNDERSTAND ')
+            if nick in self.reply_queues:
+                await self.reply_queues[nick].put(msg)
 
     async def handle(self, data):
         logging.info(data)
@@ -118,7 +186,7 @@ class Bot():
                 else:
                     await self.raw(f'JOIN {args.channel}')
                 await self.sendmsg(args.channel, "Hello, everyone! Skeleton is alive.")
-                await self.sendmsg(args.channel, f'Ask me for a joke (start line with !{self.nickname} to address me) or ask !help for details')
+                await self.sendmsg(args.channel, f'Ask me for a joke (start line with @{self.nickname} to address me) or ask !help for details')
 
             elif parts[1] == '433':
                 self.nickname += '_'
