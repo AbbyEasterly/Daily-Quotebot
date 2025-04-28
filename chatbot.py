@@ -118,7 +118,7 @@ class Bot():
                 else:
                     await self.raw(f'JOIN {args.channel}')
                 await self.sendmsg(args.channel, "Hello, everyone! Skeleton is alive.")
-                await self.sendmsg(args.channel, "Ask me for a joke (start line with !skeleton to address me) or ask !help for details")
+                await self.sendmsg(args.channel, f'Ask me for a joke (start line with !{self.nickname} to address me) or ask !help for details')
 
             elif parts[1] == '433':
                 self.nickname += '_'
