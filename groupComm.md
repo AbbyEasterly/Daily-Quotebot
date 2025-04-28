@@ -20,6 +20,11 @@ usage: chatBot.py [-h] [--password PASSWORD] [--port PORT] [--ssl] [--v4]
 chatBot.py: error: the following arguments are required: 10.20.239.122, #mychan
 
 When executing we used this command in the terminal: python /Users/josh/PycharmProjects/PythonProject/irc_bot.py 10.20.239.122 "#mychan" --port 6667
-- you will need to have your correct path to the code, but above is what it looks like on my Mac. 
+- you will need to have your correct path to the code, but above is what it looks like on my Mac.
+
+  a python file of jokes i'm going to integrate this later:
+
+  https://replit.com/@abbylynneast/MessyGoldenrodAstrophysics?v=1
+  
 
 
