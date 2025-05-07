@@ -1,5 +1,6 @@
-#edits of jokeBot but still changing DON'T DELETE EITHER ONE
-
+'''
+Ignore this doc - use jokerBot.py 
+'''
 
 #!/usr/bin/env python3
 import argparse
