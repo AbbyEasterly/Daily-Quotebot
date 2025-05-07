@@ -1,3 +1,4 @@
+
 #!/usr/bin/env python3
 import argparse
 import asyncio
@@ -9,7 +10,6 @@ import re
 import pandas as pd
 import random
 import string
-
 # === Settings ===
 cmd_flood = 3
 
@@ -27,16 +27,21 @@ def ssl_ctx(verify=False, cert_path=None, cert_pass=None) -> ssl.SSLContext:
 
 class Bot():
 
+
+
+
+
+
+
     def __init__(self):
-        self.nickname = 'skeleton'
-        self.username = 'skelly'
-        self.realname = 'Development Bot'
+        self.nickname = 'Joker'
+        self.username = 'JokerBot'
+        self.realname = 'Joker ChatBot'
         self.reader = None
         self.writer = None
         self.last = time.time()
         self.slow = False
-        self.reply_queues = {}
-        self.last_messages = {}
+
 
     async def action(self, chan, msg):
         await self.sendmsg(chan, f'\x01ACTION {msg}\x01')
@@ -46,6 +51,8 @@ class Bot():
 
     async def sendmsg(self, target, msg):
         await self.raw(f'PRIVMSG {target} :{msg}')
+
+
 
     async def connect(self):
         while True:
@@ -73,6 +80,7 @@ class Bot():
             finally:
                 await asyncio.sleep(30)
 
+
     async def eventPRIVMSG(self, data):
         parts = data.split()
         ident = parts[0][1:]
@@ -82,31 +90,82 @@ class Bot():
 
         if target == self.nickname:
             cleaned = msg.strip().lower()
-            if nick in self.last_messages and self.last_messages[nick] == cleaned:
-                await self.sendmsg(nick, "You've already said that. Got something new?")
-                return
-            self.last_messages[nick] = cleaned
-
-            if len(cleaned) > 400:
-                await self.sendmsg(nick, "Whoa!, Thats a bit too much for me to handle in one go. Try breaking it up.")
-            
-            if cleaned == "help":
-                await self.sendmsg(nick, "DM Commands: try typing 'joke' or 'who are you?'")
-                return
-            elif cleaned == "joke":
-                await self.sendmsg(nick, "I'm better with jokes in the main channel. - try @skeleton joke")
-                return
-            elif cleaned in ["who are you?", "who are you", "who r u", "who r u?"]:
-                await self.sendmsg(nick, "I'm SkeletonBot - joke-telling, message-wrangling IRC assistant!")
-
-
-
             is_punctuation_only = all(char in string.punctuation for char in cleaned)
             is_spam = len(set(cleaned)) == 1 and len(cleaned) > 5
             is_gibberish = not any(char.isalnum() for char in cleaned)
+            if len(cleaned) > 400:
+                await self.sendmsg(nick, "Whoa!, Thats a bit too much for me to handle in one go. Try breaking it up.")
 
-            if cleaned == "":
+            elif cleaned == "help":
+                await self.sendmsg(nick, "DM Commands: try typing 'joke' or 'who are you?'")
+                return
+            elif cleaned == "joke":
+                await self.sendmsg(nick, "I'm better with jokes in the main channel. - try @joker joke")
+
+            elif cleaned in ["who are you?", "who are you", "who r u", "who r u?"]:
+                await self.sendmsg(nick, "I'm JokerBot - joke-telling, message-wrangling IRC assistant!")
+
+            elif "joke" in cleaned:
+
+                jokes_split = [
+                    ("Why don’t skeletons fight each other?", "They don’t have the guts."),
+                    ("What did the janitor say when he jumped out of the closet?", "Supplies!"),
+                    ("Why did the scarecrow win an award?", "Because he was outstanding in his field."),
+                    ("What do you call fake spaghetti?", "An impasta."),
+                    ("Why can't you give Elsa a balloon?", "Because she’ll let it go."),
+                    ("I told my wife she was drawing her eyebrows too high...", "She looked surprised."),
+                    ("Parallel lines have so much in common...", "It’s a shame they’ll never meet."),
+                    ("Why did the coffee file a police report?", "It got mugged."),
+                    ("What’s orange and sounds like a parrot?", "A carrot."),
+                    ("Why don’t some couples go to the gym?", "Because some relationships don’t work out.")
+                ]
+                jokes = [
+                    {"Setup": "Knock knock", "Response": "Lettuce", "Punchline": "Lettuce in, it’s cold out here!"},
+                    {"Setup": "Knock knock", "Response": "Cow says", "Punchline": "Cow says mooo!"},
+                    {"Setup": "Knock knock", "Response": "Boo", "Punchline": "Aw, don’t cry—it’s just a joke!"},
+                    {"Setup": "Knock knock", "Response": "Tank", "Punchline": "You’re welcome!"},
+                    {"Setup": "Knock knock", "Response": "Atch", "Punchline": "Bless you!"},
+                    {"Setup": "Knock knock", "Response": "Olive", "Punchline": "Olive you and I miss you!"},
+                    {"Setup": "Knock knock", "Response": "Dishes", "Punchline": "Dishes the police—open up!"},
+                    {"Setup": "Knock knock", "Response": "Nana", "Punchline": "Nana your business!"},
+                    {"Setup": "Knock knock", "Response": "Broken Pencil", "Punchline": "Never mind, it’s pointless."},
+                    {"Setup": "Knock knock", "Response": "Ya", "Punchline": "No thanks, I use Google."},
+                ]
+                randkind = random.randint(0, 1)
+                random_number = random.randint(0, 9)
+                if randkind == 0:
+                    # Convert to a DataFrame
+                    jokes_df = pd.DataFrame(jokes)
+                    await self.action(nick, jokes_df.iloc[random_number]["Setup"])
+                    await self.action(nick, "(who's there)")
+                    await asyncio.sleep(4)
+
+                    y = jokes_df.iloc[random_number]["Response"]
+                    await self.action(nick, y)
+                    await self.action(nick, ("(" + y + " who?)"))
+                    await asyncio.sleep(4)
+
+                    await self.action(nick, (jokes_df.iloc[random_number]["Punchline"]))
+                # Display the DataFrame
+                else:
+                    df = pd.DataFrame(jokes_split, columns=["Question", "Answer"])
+
+                    await self.action(nick, df.iloc[random_number]["Question"])
+                    await asyncio.sleep(2)
+                    await self.action(nick, "...")
+                    await asyncio.sleep(2)
+                    await self.action(nick, df.iloc[random_number]["Answer"])
+
+
+
+
+
+            elif cleaned == "":
                 await self.sendmsg(nick, "Did you forget to say something?")
+            elif 'hey'  in cleaned or 'hi'  in cleaned or 'hello' in cleaned:
+                await self.action(nick, "hi!")
+            elif "haha" in cleaned or "lol" in cleaned or 'funny' in cleaned or 'lmao' in cleaned or 'hehe' in cleaned:
+                await self.sendmsg(nick, "Thanks")
             elif is_punctuation_only:
                 await self.sendmsg(nick, "All punctuation and no words makes Jack a dull bot.")
             elif is_spam:
@@ -115,6 +174,7 @@ class Bot():
                 await self.sendmsg(nick, "I'm gonna need more than symbols to help you out.")
             else:
                 await self.sendmsg(nick, "I'm not sure what you meant. Try !help or ask me for a joke!")
+
 
         elif target.startswith('#'):
             if msg.startswith('!'):
@@ -132,67 +192,168 @@ class Bot():
                     elif msg.startswith('!say') and len(msg.split()) > 1:
                         await self.sendmsg(target, ' '.join(msg.split()[1:]))
                     else:
-                        await self.sendmsg(target, f"{nick}: That command is not recognized. Try !help for what I can do.")
+                        await self.sendmsg(target,f"{nick}: That command is not recognized. Try !help for what I can do.")
                     self.last = time.time()
-            elif msg.startswith('@'):
-                if "@skeleton" in msg and "joke" in msg:
+
+
+            elif msg.startswith('@joker'):
+
+                cleaned = msg.strip().lower()
+                cleaned = cleaned.replace("@joker ", "")
+                
+
+                is_punctuation_only = all(char in string.punctuation for char in cleaned)
+
+                is_spam = len(set(cleaned)) == 1 and len(cleaned) > 5
+
+                is_gibberish = not any(char.isalnum() for char in cleaned)
+
+                if len(cleaned) > 400:
+
+                    await self.sendmsg(target,
+                                       "Whoa!, Thats a bit too much for me to handle in one go. Try breaking it up.")
+
+
+                elif cleaned == "help":
+
+                    await self.sendmsg(target, "Ask me for a joke (start line with @{self.nickname} to address me) or ask !help for details")
+
+                    return
+
+
+
+                elif cleaned in ["who are you?", "who are you", "who r u", "who r u?"]:
+
+                    await self.sendmsg(target, f"{nick}: I'm JokerBot - joke-telling, message-wrangling IRC assistant!")
+
+
+                elif "joke" in cleaned:
+
                     jokes_split = [
+
                         ("Why don’t skeletons fight each other?", "They don’t have the guts."),
+
                         ("What did the janitor say when he jumped out of the closet?", "Supplies!"),
+
                         ("Why did the scarecrow win an award?", "Because he was outstanding in his field."),
+
                         ("What do you call fake spaghetti?", "An impasta."),
+
                         ("Why can't you give Elsa a balloon?", "Because she’ll let it go."),
+
                         ("I told my wife she was drawing her eyebrows too high...", "She looked surprised."),
+
                         ("Parallel lines have so much in common...", "It’s a shame they’ll never meet."),
+
                         ("Why did the coffee file a police report?", "It got mugged."),
+
                         ("What’s orange and sounds like a parrot?", "A carrot."),
+
                         ("Why don’t some couples go to the gym?", "Because some relationships don’t work out.")
+
                     ]
+
                     jokes = [
-                        {"Setup": "Knock knock", "Response": "Lettuce","Punchline": "Lettuce in, it’s cold out here!"},
+
+                        {"Setup": "Knock knock", "Response": "Lettuce", "Punchline": "Lettuce in, it’s cold out here!"},
+
                         {"Setup": "Knock knock", "Response": "Cow says", "Punchline": "Cow says mooo!"},
+
                         {"Setup": "Knock knock", "Response": "Boo", "Punchline": "Aw, don’t cry—it’s just a joke!"},
+
                         {"Setup": "Knock knock", "Response": "Tank", "Punchline": "You’re welcome!"},
+
                         {"Setup": "Knock knock", "Response": "Atch", "Punchline": "Bless you!"},
+
                         {"Setup": "Knock knock", "Response": "Olive", "Punchline": "Olive you and I miss you!"},
+
                         {"Setup": "Knock knock", "Response": "Dishes", "Punchline": "Dishes the police—open up!"},
+
                         {"Setup": "Knock knock", "Response": "Nana", "Punchline": "Nana your business!"},
-                        {"Setup": "Knock knock", "Response": "Broken Pencil",   "Punchline": "Never mind, it’s pointless."},
-                        {"Setup": "Knock knock", "Response": "Ya", "Punchline": "No thanks, I use Google."}
+
+                        {"Setup": "Knock knock", "Response": "Broken Pencil",
+                         "Punchline": "Never mind, it’s pointless."},
+
+                        {"Setup": "Knock knock", "Response": "Ya", "Punchline": "No thanks, I use Google."},
+
                     ]
+
                     randkind = random.randint(0, 1)
+
                     random_number = random.randint(0, 9)
+
                     if randkind == 0:
+
+                        # Convert to a DataFrame
+
                         jokes_df = pd.DataFrame(jokes)
+
                         await self.action(target, jokes_df.iloc[random_number]["Setup"])
-                        await self.action(target, "(say 'who's there)")
+
+                        await self.action(target, "(who's there)")
+
                         await asyncio.sleep(4)
+
                         y = jokes_df.iloc[random_number]["Response"]
+
                         await self.action(target, y)
-                        await self.action(target, ("(you say: " + y + " who?)"))
+
+                        await self.action(target, ("(" + y + " who?)"))
+
                         await asyncio.sleep(4)
+
                         await self.action(target, (jokes_df.iloc[random_number]["Punchline"]))
+
+                    # Display the DataFrame
+
                     else:
+
                         df = pd.DataFrame(jokes_split, columns=["Question", "Answer"])
+
                         await self.action(target, df.iloc[random_number]["Question"])
+
                         await asyncio.sleep(2)
+
                         await self.action(target, "...")
+
                         await asyncio.sleep(2)
+
                         await self.action(target, df.iloc[random_number]["Answer"])
-                elif f"@{self.nickname}" in msg:
-                    cleaned = msg.replace(f"@{self.nickname}", "").strip().lower()
-                    if cleaned =="":
-                        await self.sendmsg(target, f"{nick}: You mentioned me, but didn't say anything!")
-                    elif len(cleaned) <4:
-                        await self.sendmsg(target, f"{nick}: Try being a little more specific. I can't help you with that.")
-                    elif not any(word in cleaned for word in ["joke", "help", "who", "you", "skeleton", "bot"]):
-                        await self.sendmsg(target, f"{nick}: Hmm, I don't know what you mean. Try '@skeleton joke' ")
-                    else:
-                        await self.sendmsg(target, f"{nick}: I'm not sure what you meant - type !help or ask me for a joke.")
-                elif re.match(r'^!skeleton[a-zA-Z 0-9,;.!?\'"-]+$', msg):
-                    await self.action(target, 'I DONT UNDERSTAND ')
-            if nick in self.reply_queues:
-                await self.reply_queues[nick].put(msg)
+
+
+
+
+
+
+                elif cleaned == "":
+
+                    await self.sendmsg(target, f"Hey {nick}. Did you forget to say something?")
+
+                elif 'hey' in cleaned or 'hi' in cleaned or 'hello' in cleaned:
+
+                    await self.action(target, f"Hi {nick}!")
+
+                elif "haha" in cleaned or "lol" in cleaned or 'funny' in cleaned or 'lmao' in cleaned or 'hehe' in cleaned:
+
+                    await self.sendmsg(target, f"Thanks, {nick}")
+
+
+                elif is_punctuation_only:
+
+                    await self.sendmsg(target, f"{nick}:All punctuation and no words makes Jack a dull bot.")
+
+                elif is_spam:
+
+                    await self.sendmsg(target, f"{nick} That's a lot of the same thing. You okay?")
+
+                elif is_gibberish:
+
+                    await self.sendmsg(target, f"{nick} I'm gonna need more than symbols to help you out.")
+
+                else:
+
+                    await self.sendmsg(target,
+                                       f"{nick}, I'm not sure what you meant - type !help or ask me for a joke.")
 
     async def handle(self, data):
         logging.info(data)
@@ -204,13 +365,17 @@ class Bot():
                 await self.raw('PONG ' + parts[1])
             elif parts[1] == '001':
                 await self.raw(f'MODE {self.nickname} +B')
+                # Commented out for now: NickServ and OPER (used in testing)
+                # await self.sendmsg('NickServ', f'IDENTIFY {self.nickname} simps0nsfan420')
+                # await self.raw('OPER MrSysadmin fartsimps0n1337')
                 await asyncio.sleep(10)
                 if hasattr(args, 'key') and args.key:
                     await self.raw(f'JOIN {args.channel} {args.key}')
                 else:
                     await self.raw(f'JOIN {args.channel}')
-                await self.sendmsg(args.channel, "Hello, everyone! Skeleton is alive.")
-                await self.sendmsg(args.channel, f'Ask me for a joke (start line with @{self.nickname} to address me) or ask !help for details')
+                await self.sendmsg(args.channel, "Hello, everyone! Joker is alive.")
+                await self.sendmsg(args.channel, f'Ask me for a joke (start line with @{self.nickname} to address me) or ask help for details')
+
             elif parts[1] == '433':
                 self.nickname += '_'
                 await self.raw('NICK ' + self.nickname)
@@ -257,7 +422,6 @@ if __name__ == '__main__':
 
     print(f"Connecting to {args.server}:{args.port or ('6697' if args.ssl else '6667')} (SSL: {args.ssl}) and joining {args.channel} (Key: {args.key or 'None'})")
 
-    setup_logger('skeleton', to_file=True)
+    setup_logger('Joker', to_file=True)
     bot = Bot()
     asyncio.run(bot.connect())
-
